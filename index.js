@@ -7,10 +7,12 @@ const ACCESS_KEY = process.env.UNSPLASH_KEY;
 
 app.get("/api/image", async (req, res) => {
   const query = req.query.q;
-  if (!query || !ACCESS_KEY) return res.status(400).json({ error: "Missing query or API key" });
+  if (!query || !ACCESS_KEY) {
+    return res.status(400).json({ error: "Missing query or API key" });
+  }
 
   try {
-    const search = await fetch(\`https://api.unsplash.com/search/photos?query=\${encodeURIComponent(query)}&client_id=\${ACCESS_KEY}\`);
+    const search = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${ACCESS_KEY}`);
     const data = await search.json();
     const imageUrl = data.results[0]?.urls?.regular;
 
@@ -21,7 +23,7 @@ app.get("/api/image", async (req, res) => {
     const base64 = Buffer.from(buffer).toString("base64");
     const mime = imageRes.headers.get("content-type");
 
-    res.json({ image: \`data:\${mime};base64,\${base64}\` });
+    res.json({ image: `data:${mime};base64,${base64}` });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch image", details: err.message });
   }
